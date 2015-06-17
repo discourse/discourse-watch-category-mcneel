@@ -8,9 +8,11 @@ module ::WatchCategory
   def self.watch_category!
     mcneel_private_category = Category.find_by_slug("mcneel-private")
     mcneel_group = Group.find_by_name("mcneel")
+    return if mcneel_private_category.nil? || mcneel_group.nil?
 
     mcneel_group.users.each do |user|
-      CategoryUser.set_notification_level_for_category(user, CategoryUser.notification_levels[:watching], mcneel_private_category.id)
+      watched_categories = CategoryUser.lookup(user, :watching).pluck(:category_id)
+      CategoryUser.set_notification_level_for_category(user, CategoryUser.notification_levels[:watching], mcneel_private_category.id) unless watched_categories.include?(mcneel_private_category.id)
     end
   end
 end
