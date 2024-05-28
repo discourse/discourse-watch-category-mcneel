@@ -13,7 +13,7 @@ module ::WatchCategory
     unless mcneel_private_category.nil? || mcneel_group.nil?
       mcneel_group.users.each do |user|
         watched_categories = CategoryUser.lookup(user, :watching).pluck(:category_id)
-        unless watched_categories.include?(mcneel_private_category.id)
+        if watched_categories.exclude?(mcneel_private_category.id)
           CategoryUser.set_notification_level_for_category(
             user,
             CategoryUser.notification_levels[:watching],
@@ -29,7 +29,7 @@ module ::WatchCategory
 
     reseller_group.users.each do |user|
       watched_categories = CategoryUser.lookup(user, :watching).pluck(:category_id)
-      unless watched_categories.include?(reseller_category.id)
+      if watched_categories.exclude?(reseller_category.id)
         CategoryUser.set_notification_level_for_category(
           user,
           CategoryUser.notification_levels[:watching],
